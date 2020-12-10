@@ -6,10 +6,16 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            var sber = new QiitaSourceGenerator.Helper.StringBuilderChains.StringBuilderChainsEmpty();
-            var sbe2 = sber + "hello";
+            var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainAutoBreak();
+            sb += "hello";
+            sb += "where";
+            sb += "are you?";
+            var sb2= new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChain(sb," ...");
+            sb2 += "hohoho";
 
-            Console.WriteLine("Hello World!");
+            var builder = sb2.GetStringBuilder();
+
+            Console.WriteLine(builder.ToString());
         }
     }
 }
