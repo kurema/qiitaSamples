@@ -14,7 +14,6 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
     {
         protected TextChainBase()
         {
-            Appended = string.Empty;
         }
 
         protected TextChainBase(T? origin, string appended)
@@ -25,8 +24,8 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
 
         public abstract StringBuilder GetStringBuilder();
 
-        public T? Origin { get; protected set; }
-        public string Appended { get; protected set; }
+        public T? Origin { get; protected set; } = default(T);
+        public string? Appended { get; protected set; } = null;
     }
 
     public class TextChain : TextChainBase<IStringBuilderProvider>
@@ -37,7 +36,7 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public override StringBuilder GetStringBuilder()
         {
             var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
-            if (Appended != string.Empty) sb.Append(Appended);
+            if (!string.IsNullOrEmpty(Appended)) sb.Append(Appended);
             return sb;
         }
 
@@ -71,6 +70,10 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public static TextChainBrainfuck operator >(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '>', '<');
         public static TextChainBrainfuck operator <(TextChainBrainfuck origin, int count) => origin > (-count);
 
+        public static TextChainBrainfuck operator >>(TextChainBrainfuck origin, int count) => origin > count;
+        public static TextChainBrainfuck operator <<(TextChainBrainfuck origin, int count) => origin > (-count);
+
+
         public static TextChainBrainfuck operator *(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '.');
         public static TextChainBrainfuck operator /(TextChainBrainfuck origin, int count) => RepeatText(origin, count, ',');
 
@@ -80,7 +83,7 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public static TextChainBrainfuck operator +(TextChainBrainfuck origin, string text) => new TextChainBrainfuck(origin, text);
 
 
-        private static TextChainBrainfuck RepeatText(TextChainBrainfuck origin, int count, char positiveChar, char? negativeChar=null)
+        private static TextChainBrainfuck RepeatText(TextChainBrainfuck origin, int count, char positiveChar, char? negativeChar = null)
         {
             if (count > 0)
             {
@@ -91,6 +94,60 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
                 return new TextChainBrainfuck(origin, new string(negativeChar ?? throw new ArgumentNullException(), -count));
             }
             else return origin;
+        }
+
+        public static string GenerateCodeFromBrainfuck(string brainfuck,string varName)
+        {
+            string? GetCode(char character,int count)
+            {
+                switch (character)
+                {
+                    case '>': return $"{varName} >>= {count};";
+                    case '<': return $"{varName} <<= {count};";
+                    case '.': return $"{varName} *= {count};";
+                    case ',': return $"{varName} /= {count};";
+                    case '+' when count == 1: return $"{varName} ++;";
+                    case '+': return $"{varName} += {count};";
+                    case '-' when count == 1: return $"{varName} --;";
+                    case '-': return $"{varName} -= {count};";
+                    case '[' when count == 1: return $"{varName} = !{varName};";
+                    case '[': return $"{varName} &= {count};";
+                    case ']' when count == 1: return $"{varName} = ~{varName};";
+                    case ']': return $"{varName} |= {count};";
+                    default: return null;
+                }
+            }
+
+            char? lastChar = null;
+            int lastCharCount = 0;
+
+            var result = new TextChainAutoBreak();
+
+            void appendCode()
+            {
+                if (lastChar != null)
+                {
+                    var code = GetCode(lastChar ?? ' ', lastCharCount);
+                    if (code != null) result += code;
+                }
+            }
+
+            foreach (var character in brainfuck)
+            {
+                if (lastChar == character)
+                {
+                    lastCharCount++;
+                    continue;
+                }
+
+                appendCode();
+
+                lastChar = character;
+                lastCharCount = 1;
+            }
+            appendCode();
+
+            return result.GetStringBuilder().ToString();
         }
     }
 
@@ -103,29 +160,55 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public override StringBuilder GetStringBuilder()
         {
             var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
-            if (Appended != string.Empty) sb.AppendLine(Appended);
+            if (Appended is not null) sb.AppendLine(Appended);
             return sb;
         }
 
         public static TextChainAutoBreak operator +(TextChainAutoBreak origin, string append) => new TextChainAutoBreak(origin, append);
     }
 
-    public class TextChainAutoIndent : TextChainBase<TextChainAutoIndent>
+    public class TextChainAutoIndent : TextChainBase<IStringBuilderProvider>
     {
         public TextChainAutoIndent() : base() { }
         public TextChainAutoIndent(TextChainAutoIndent? origin, string appended) : base(origin, appended) { }
 
-        public int IndentShift { get; set; }
-        public int Indent { get => Math.Max((Origin?.Indent ?? 0) + IndentShift, 0); }
+        public int IndentShift { get; set; } = 0;
+        public string? IndentText { get; set; } = null;
+
+        public static string IndentTextDefault = "    ";
 
         public override StringBuilder GetStringBuilder()
         {
-            var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
-            if (Appended != string.Empty)
+            var result = GetStringBuilderAndInfo();
+            return result.Builder;
+        }
+
+        public void Indent() => IndentShift++;
+        public void Unindent() => IndentShift--;
+
+        public (StringBuilder Builder, int IndentLevel, string IndentText) GetStringBuilderAndInfo()
+        {
+            switch (Origin)
             {
-                sb.AppendLine(Appended);
+                case TextChainAutoIndent originIndent:
+                    {
+                        var currentResult = originIndent.GetStringBuilderAndInfo();
+                        if (Appended is not null)
+                        {
+                            for (int i = 0; i < currentResult.IndentLevel; i++) currentResult.Builder.Append(currentResult.IndentText);
+                            currentResult.Builder.AppendLine(Appended);
+                        }
+                        return IndentText is null ?
+                            (currentResult.Builder, currentResult.IndentLevel + IndentShift, currentResult.IndentText) :
+                            (currentResult.Builder, IndentShift, IndentText);
+                    }
+                default:
+                    {
+                        var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+                        if (Appended is not null) sb.AppendLine(Appended);
+                        return (sb, IndentShift, IndentText ?? IndentTextDefault);
+                    }
             }
-            return sb;
         }
 
         public static TextChainAutoIndent operator +(TextChainAutoIndent origin, string append) => new TextChainAutoIndent(origin, append);
