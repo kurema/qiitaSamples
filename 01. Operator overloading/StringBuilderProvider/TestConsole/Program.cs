@@ -1,4 +1,5 @@
 ﻿using System;
+using kurema.StringBuilderProvider;
 
 namespace TestConsole
 {
@@ -7,8 +8,8 @@ namespace TestConsole
         static void Main(string[] args)
         {
             {
-                var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainAutoBreak();
-                //random word from Hamlet by William Shakespeare
+                var sb = new TextChainAutoBreak();
+                //random phrase from Hamlet by William Shakespeare
                 sb += "Hor. And then it started, like a guilty thing";
                 sb += "Vpon a fearfull Summons. I haue heard,";
                 sb += "The Cocke that is the Trumpet to the day,";
@@ -17,7 +18,7 @@ namespace TestConsole
                 Console.Write(builder.ToString());
             }
             {
-                var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainBrainfuck();
+                var sb = new TextChainBrainfuck();
 
                 sb--;
                 sb >>= 1;
@@ -224,13 +225,20 @@ namespace TestConsole
                 sb <<= 1;
                 sb = ~sb;
 
-                var builder = sb.GetStringBuilder();
-                Console.WriteLine(builder.ToString());
+                var text = sb.GetStringBuilder().ToString();
+                Console.WriteLine(text);
+
+                using (var sw = new System.IO.StringWriter())
+                {
+                    var engine = new BrainfuckRunner.Library.BfEngine() { Output = sw };
+                    engine.ExecuteScript(text);
+                    var result = sw.GetStringBuilder().ToString();
+                    Console.WriteLine(result);
+                }
             }
 
             {
-                var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainAutoIndent();
-                sb.IndentText = "   ";
+                var sb = new TextChainAutoIndent();
                 sb += "namespace TestConsole";
                 sb += "{";
                 sb.Indent();
@@ -241,14 +249,13 @@ namespace TestConsole
                 sb += "{";
                 sb += "}";
                 sb.Unindent();
-                sb+= "}";
+                sb += "}";
                 sb.Unindent();
                 sb += "}";
 
                 var builder = sb.GetStringBuilder();
                 Console.WriteLine(builder.ToString());
             }
-
         }
     }
 }

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QiitaSourceGenerator.Helper.StringBuilderProviders
+namespace kurema.StringBuilderProvider
 {
-
     public interface IStringBuilderProvider
     {
         StringBuilder GetStringBuilder();
@@ -96,9 +95,9 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
             else return origin;
         }
 
-        public static string GenerateCodeFromBrainfuck(string brainfuck,string varName)
+        public static string GenerateCodeFromBrainfuck(string brainfuck, string varName)
         {
-            string? GetCode(char character,int count)
+            string? GetCode(char character, int count)
             {
                 switch (character)
                 {
@@ -175,7 +174,7 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public int IndentShift { get; set; } = 0;
         public string? IndentText { get; set; } = null;
 
-        public static string IndentTextDefault = "    ";
+        public static string IndentTextDefault = new string(' ', 4);
 
         public override StringBuilder GetStringBuilder()
         {
