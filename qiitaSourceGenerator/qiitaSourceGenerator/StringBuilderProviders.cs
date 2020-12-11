@@ -44,6 +44,56 @@ namespace QiitaSourceGenerator.Helper.StringBuilderProviders
         public static TextChain operator +(TextChain origin, string append) => new TextChain(origin, append);
     }
 
+    public class TextChainBrainfuck : TextChain
+    {
+        public TextChainBrainfuck()
+        {
+        }
+
+        public TextChainBrainfuck(IStringBuilderProvider? origin, string appended) : base(origin, appended)
+        {
+        }
+
+        public static TextChainBrainfuck operator +(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "+");
+        public static TextChainBrainfuck operator -(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "-");
+
+        public static TextChainBrainfuck operator ++(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "+");
+        public static TextChainBrainfuck operator --(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "-");
+
+        public static TextChainBrainfuck operator !(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "[");
+        public static TextChainBrainfuck operator ~(TextChainBrainfuck origin) => new TextChainBrainfuck(origin, "]");
+
+
+        public static TextChainBrainfuck operator +(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '+', '-');
+
+        public static TextChainBrainfuck operator -(TextChainBrainfuck origin, int count) => origin + (-count);
+
+        public static TextChainBrainfuck operator >(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '>', '<');
+        public static TextChainBrainfuck operator <(TextChainBrainfuck origin, int count) => origin > (-count);
+
+        public static TextChainBrainfuck operator *(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '.');
+        public static TextChainBrainfuck operator /(TextChainBrainfuck origin, int count) => RepeatText(origin, count, ',');
+
+        public static TextChainBrainfuck operator &(TextChainBrainfuck origin, int count) => RepeatText(origin, count, '[');
+        public static TextChainBrainfuck operator |(TextChainBrainfuck origin, int count) => RepeatText(origin, count, ']');
+
+        public static TextChainBrainfuck operator +(TextChainBrainfuck origin, string text) => new TextChainBrainfuck(origin, text);
+
+
+        private static TextChainBrainfuck RepeatText(TextChainBrainfuck origin, int count, char positiveChar, char? negativeChar=null)
+        {
+            if (count > 0)
+            {
+                return new TextChainBrainfuck(origin, new string(positiveChar, count));
+            }
+            else if (count < 0)
+            {
+                return new TextChainBrainfuck(origin, new string(negativeChar ?? throw new ArgumentNullException(), -count));
+            }
+            else return origin;
+        }
+    }
+
     public class TextChainAutoBreak : TextChainBase<IStringBuilderProvider>
     {
         public TextChainAutoBreak() : base() { }

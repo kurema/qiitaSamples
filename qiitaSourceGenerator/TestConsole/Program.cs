@@ -6,16 +6,35 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainAutoBreak();
-            sb += "hello";
-            sb += "where";
-            sb += "are you?";
-            var sb2= new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChain(sb," ...");
-            sb2 += "hohoho";
+            {
+                var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainAutoBreak();
+                sb += "hello";
+                sb += "where";
+                sb += "are you?" + "and me";
 
-            var builder = sb2.GetStringBuilder();
+                var builder = sb.GetStringBuilder();
+                Console.WriteLine(builder.ToString());
+            }
+            {
+                var sb = new QiitaSourceGenerator.Helper.StringBuilderProviders.TextChainBrainfuck();
+                sb++;
+                sb--;
+                sb += 2;
+                sb += -3;
+                sb -= -5;
+                sb -= 4;
+                sb = !sb;
+                sb = ~sb;
+                sb *= 1;
+                sb /= 1;
+                sb &= 1;
+                sb |= 1;
 
-            Console.WriteLine(builder.ToString());
+                var builder = sb.GetStringBuilder();
+                Console.WriteLine(builder.ToString());
+            }
+
+
         }
     }
 }
