@@ -1,58 +1,83 @@
 ﻿using System;
+using kurema.TernaryComparisonOperator;
 
 namespace kurema.TernaryComparisonOperator
 {
-    public class ComparisonValue<T1, T2> where T1 : IComparable<T1> where T2 : IComparable<T2>
+    public class ComparisonValueDouble : IEquatable<ComparisonValueDouble?>
     {
-        public ComparisonValue(bool status, T1? valueLeft, T2? valueRight)
+        public ComparisonValueDouble(bool status, double valueLeft, double valurRight)
         {
             Status = status;
-            //ValueLeft = valueLeft;
-            //ValueRight = valueRight;
+            ValueLeft = valueLeft;
+            ValueRight = valurRight;
         }
 
-        public ComparableValue<T1> ValueLeft { get; init; }
-        public ComparableValue<T2> ValueRight { get; init; }
+        public double ValueLeft { get; init; }
+        public double ValueRight { get; init; }
+        public bool Status { get; init; }
 
-        public bool Status { get; init; } = true;
+        public static bool operator true(ComparisonValueDouble value) => value.Status;
+        public static bool operator false(ComparisonValueDouble value) => !value.Status;
 
-        public static ComparisonValue<T1, double> operator <(ComparisonValue<T1, T2> left, double right)
+        public static ComparisonValueDouble operator <(ComparisonValueDouble left, ComparisonValueDouble right) => Combine(left, right, left.ValueRight < right.ValueLeft);
+        public static ComparisonValueDouble operator >(ComparisonValueDouble left, ComparisonValueDouble right) => Combine(left, right, left.ValueRight > right.ValueLeft);
+        public static ComparisonValueDouble operator <=(ComparisonValueDouble left, ComparisonValueDouble right) => Combine(left, right, left.ValueRight <= right.ValueLeft);
+        public static ComparisonValueDouble operator >=(ComparisonValueDouble left, ComparisonValueDouble right) => Combine(left, right, left.ValueRight >= right.ValueLeft);
+        //ここは判断に迷う。
+        //( 2.ToComp() < 3 ) == ( 3.ToComp() < 4) を 2 < 3 && 3 == 3 && 3 < 4 と解釈するか ( 2 < 3 ) == ( 3 < 4 ) と解釈するか。後者かな。
+        public static bool operator ==(ComparisonValueDouble left, ComparisonValueDouble right) => left?.Equals(right) ?? right is null;
+        public static bool operator !=(ComparisonValueDouble left, ComparisonValueDouble right) => !(left == right);
+
+        public static ComparisonValueDouble operator <(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight < right, left.ValueRight, right);
+        public static ComparisonValueDouble operator >(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight > right, left.ValueRight, right);
+        public static ComparisonValueDouble operator <=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight <= right, left.ValueRight, right);
+        public static ComparisonValueDouble operator >=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight >= right, left.ValueRight, right);
+        public static ComparisonValueDouble operator ==(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight == right, left.ValueRight, right);
+        public static ComparisonValueDouble operator !=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight != right, left.ValueRight, right);
+
+        public static ComparisonValueDouble operator <(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left < right.ValueLeft, left, right.ValueRight);
+        public static ComparisonValueDouble operator >(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left > right.ValueLeft, left, right.ValueRight);
+        public static ComparisonValueDouble operator <=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left <= right.ValueLeft, left, right.ValueRight);
+        public static ComparisonValueDouble operator >=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left >= right.ValueLeft, left, right.ValueRight);
+        public static ComparisonValueDouble operator ==(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left == right.ValueLeft, left, right.ValueRight);
+        public static ComparisonValueDouble operator !=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left != right.ValueLeft, left, right.ValueRight);
+
+
+
+        public static implicit operator bool(ComparisonValueDouble from) => from.Status;
+
+
+        public static ComparisonValueDouble Combine(ComparisonValueDouble left, ComparisonValueDouble right, bool condition)
+            => new ComparisonValueDouble(condition && left.Status && right.Status, left.ValueLeft, right.ValueRight);
+
+        public override bool Equals(object? obj)
         {
-            return new ComparisonValue<T1, double>(left.Status && left.ValueRight?.CompareTo(right) is null or < 0, left.ValueLeft, right);
+            return Equals(obj as ComparisonValueDouble);
         }
 
-        public static ComparisonValue<T1, double> operator >(ComparisonValue<T1, T2> left, double right)
+        public bool Equals(ComparisonValueDouble? other)
         {
-            return new ComparisonValue<T1, double>(left.Status && left.ValueRight?.CompareTo(right) is null or > 0, left.ValueLeft, right);
+            return other is not null && Status == other.Status;
         }
 
-        //private static bool CheckTwice(ComparisonValue<T1, T2> comparisonValue, bool IsComparisonValueRight, bool extraCondition)
-        //{
-        //    return comparisonValue.Status && ((IsComparisonValueRight ? (comparisonValue.ValueRight is null) : (comparisonValue.ValueLeft is null)) || extraCondition);
-        //}
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ValueLeft, ValueRight, Status);
+        }
 
     }
 
-    public struct ComparableValue<T> :IComparable where T : IComparable<T>
-    {
-        public double ValueDouble { get; init; }
-        public T ValueNative { get; init; }
-        public bool AlwaysTrue { get; init; }
-
-        public int CompareTo(object? obj)
-        {
-            if(obj is T native)
-            {
-            }
-            return 0;
-        }
-    }
 
     public static class Extensions
     {
-        //public static ComparisonValue<double> ToComp(this double from)
-        //{
-        //    return new ComparisonValue<double>();
-        //}
+        public static ComparisonValueDouble ToComp(this double from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static void Main()
+        {
+            Console.WriteLine(2.0.ToComp() < 3.0.ToComp());
+        }
     }
 }
