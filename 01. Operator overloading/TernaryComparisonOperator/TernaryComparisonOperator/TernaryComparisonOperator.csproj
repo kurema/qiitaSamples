@@ -6,4 +6,8 @@
     <RootNamespace>kurema.TernaryComparisonOperator</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OperatorOverloadingAttacher\OperatorOverloadingAttacher.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
