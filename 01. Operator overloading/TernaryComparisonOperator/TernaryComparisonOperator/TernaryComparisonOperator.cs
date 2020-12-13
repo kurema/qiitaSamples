@@ -29,22 +29,6 @@ namespace kurema.TernaryComparisonOperator
         public static bool operator ==(ComparisonValueDouble left, ComparisonValueDouble right) => left?.Equals(right) ?? right is null;
         public static bool operator !=(ComparisonValueDouble left, ComparisonValueDouble right) => !(left == right);
 
-        public static ComparisonValueDouble operator <(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight < right, left.ValueRight, right);
-        public static ComparisonValueDouble operator >(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight > right, left.ValueRight, right);
-        public static ComparisonValueDouble operator <=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight <= right, left.ValueRight, right);
-        public static ComparisonValueDouble operator >=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight >= right, left.ValueRight, right);
-        public static ComparisonValueDouble operator ==(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight == right, left.ValueRight, right);
-        public static ComparisonValueDouble operator !=(ComparisonValueDouble left, double right) => new ComparisonValueDouble(left.ValueRight != right, left.ValueRight, right);
-
-        public static ComparisonValueDouble operator <(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left < right.ValueLeft, left, right.ValueRight);
-        public static ComparisonValueDouble operator >(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left > right.ValueLeft, left, right.ValueRight);
-        public static ComparisonValueDouble operator <=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left <= right.ValueLeft, left, right.ValueRight);
-        public static ComparisonValueDouble operator >=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left >= right.ValueLeft, left, right.ValueRight);
-        public static ComparisonValueDouble operator ==(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left == right.ValueLeft, left, right.ValueRight);
-        public static ComparisonValueDouble operator !=(double left, ComparisonValueDouble right) => new ComparisonValueDouble(left != right.ValueLeft, left, right.ValueRight);
-
-
-
         public static implicit operator bool(ComparisonValueDouble from) => from.Status;
 
 
@@ -65,7 +49,6 @@ namespace kurema.TernaryComparisonOperator
         {
             return HashCode.Combine(ValueLeft, ValueRight, Status);
         }
-
     }
 
 
@@ -76,9 +59,49 @@ namespace kurema.TernaryComparisonOperator
             return new ComparisonValueDouble(true, from, from);
         }
 
-        public static void Main()
+        public static ComparisonValueDouble ToComp(this float from)
         {
-            Console.WriteLine(2.0.ToComp() < 3.0.ToComp());
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this sbyte from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this byte from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this short from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this ushort from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this int from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this uint from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this long from)
+        {
+            return new ComparisonValueDouble(true, from, from);
+        }
+
+        public static ComparisonValueDouble ToComp(this ulong from)
+        {
+            return new ComparisonValueDouble(true, from, from);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace kurema.TernaryComparisonOperator.OperatorOverloadingAttacher
     public sealed class OperatorOverloadingAttachTargetAttribute : Attribute { }
 }
 ";
+        private readonly string[] Operators = new[] { "==", "!=", "<", ">", "<=", ">=" };
 
         public void Execute(GeneratorExecutionContext context)
         {
@@ -31,10 +32,35 @@ namespace kurema.TernaryComparisonOperator.OperatorOverloadingAttacher
             var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(attributeSource, Encoding.UTF8), options));
             var attributeSymbol = compilation.GetTypeByMetadataName("kurema.TernaryComparisonOperator.OperatorOverloadingAttacher.OperatorOverloadingAttachTargetAttribute");
 
-            foreach(var candidate in receiver.CandidateClasses)
+            var codeText = new kurema.StringBuilderProvider.TextChainAutoIndent();
+            codeText += $"#nullable enable";
+            foreach (var candidate in receiver.CandidateClasses)
             {
+                var model = compilation.GetSemanticModel(candidate.SyntaxTree);
+                var typeSymbol = ModelExtensions.GetDeclaredSymbol(model, candidate);
+                if (typeSymbol == null) continue;
+                var attribute = typeSymbol.GetAttributes().FirstOrDefault(ad => ad.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
+                if (attribute is null) continue;
+                var namespaceName = typeSymbol.ContainingNamespace.ToDisplayString();
+                var className = typeSymbol.Name;
 
+                codeText += $"namespace {namespaceName}";
+                codeText += $"{{";
+                codeText.Indent();
+                codeText += $"public partial class {className}";
+                codeText += $"{{";
+                codeText.Indent();
+                foreach(var @operator in Operators)
+                {
+                    codeText += $"public static {className} operator {@operator}({className} left, double right) => new {className}(left.Status && left.ValueRight {@operator} right, left.ValueLeft, right);";
+                    codeText += $"public static {className} operator {@operator}(double left, {className} right) => new {className}(right.Status && left {@operator} right.ValueLeft, left, right.ValueRight);";
+                }
+                codeText.Unindent();
+                codeText += $"}}";
+                codeText.Unindent();
+                codeText += $"}}";
             }
+            context.AddSource("OperatorOverloadingAttachement_partial.cs", SourceText.From(codeText.ToString(), Encoding.UTF8));
         }
 
         public void Initialize(GeneratorInitializationContext context)
