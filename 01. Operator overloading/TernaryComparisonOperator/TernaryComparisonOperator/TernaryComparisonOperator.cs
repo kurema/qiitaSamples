@@ -3,9 +3,10 @@ using kurema.TernaryComparisonOperator;
 
 namespace kurema.TernaryComparisonOperator
 {
-    public class ComparisonValueDouble : IEquatable<ComparisonValueDouble?>
+    [kurema.TernaryComparisonOperator.OperatorOverloadingAttacher.OperatorOverloadingAttachTarget]
+    public partial class ComparisonValueDouble : IEquatable<ComparisonValueDouble?>
     {
-        public ComparisonValueDouble(bool status, double valueLeft, double valurRight)
+        internal ComparisonValueDouble(bool status, double valueLeft, double valurRight)
         {
             Status = status;
             ValueLeft = valueLeft;

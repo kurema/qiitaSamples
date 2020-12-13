@@ -6,10 +6,13 @@
     <Nullable>enable</Nullable>
     <RootNamespace>kurema.TernaryComparisonOperator.OperatorOverloadingAttacher</RootNamespace>
     <AssemblyName>OperatorOverloadingAttacher</AssemblyName>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\StringBuilderProvider\StringBuilderProvider\StringBuilderProvider.csproj" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-5.final" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

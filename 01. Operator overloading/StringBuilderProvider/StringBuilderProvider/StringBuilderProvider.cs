@@ -40,6 +40,9 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChain operator +(TextChain origin, string append) => new TextChain(origin, append);
+
+        public static implicit operator string(TextChain from)=>from.ToString();
+        public override string ToString() => this.GetStringBuilder().ToString();
     }
 
     public class TextChainBrainfuck : TextChain
@@ -164,6 +167,10 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChainAutoBreak operator +(TextChainAutoBreak origin, string append) => new TextChainAutoBreak(origin, append);
+
+        public static implicit operator string(TextChainAutoBreak from) => from.ToString();
+        public override string ToString() => this.GetStringBuilder().ToString();
+
     }
 
     public class TextChainAutoIndent : TextChainBase<IStringBuilderProvider>
@@ -211,6 +218,10 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChainAutoIndent operator +(TextChainAutoIndent origin, string append) => new TextChainAutoIndent(origin, append);
+
+        public static implicit operator string(TextChainAutoIndent from) => from.ToString();
+        public override string ToString() => this.GetStringBuilder().ToString();
+
     }
 
 }
