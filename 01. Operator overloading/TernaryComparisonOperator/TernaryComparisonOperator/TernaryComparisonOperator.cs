@@ -6,11 +6,11 @@ namespace kurema.TernaryComparisonOperator
     [kurema.TernaryComparisonOperator.OperatorOverloadingAttacher.OperatorOverloadingAttachTarget]
     public partial class ComparisonValueDouble : IEquatable<ComparisonValueDouble?>
     {
-        internal ComparisonValueDouble(bool status, double valueLeft, double valurRight)
+        internal ComparisonValueDouble(bool status, double valueLeft, double valueRight)
         {
             Status = status;
             ValueLeft = valueLeft;
-            ValueRight = valurRight;
+            ValueRight = valueRight;
         }
 
         public double ValueLeft { get; init; }

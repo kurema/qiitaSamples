@@ -44,9 +44,12 @@ namespace kurema.TernaryComparisonOperator.OperatorOverloadingAttacher
                 var namespaceName = typeSymbol.ContainingNamespace.ToDisplayString();
                 var className = typeSymbol.Name;
 
-                codeText += $"namespace {namespaceName}";
-                codeText += $"{{";
-                codeText.Indent();
+                if (!typeSymbol.ContainingNamespace.IsGlobalNamespace)
+                {
+                    codeText += $"namespace {namespaceName}";
+                    codeText += $"{{";
+                    codeText.Indent();
+                }
                 codeText += $"public partial class {className}";
                 codeText += $"{{";
                 codeText.Indent();
@@ -57,8 +60,11 @@ namespace kurema.TernaryComparisonOperator.OperatorOverloadingAttacher
                 }
                 codeText.Unindent();
                 codeText += $"}}";
-                codeText.Unindent();
-                codeText += $"}}";
+                if (!typeSymbol.ContainingNamespace.IsGlobalNamespace)
+                {
+                    codeText.Unindent();
+                    codeText += $"}}";
+                }
             }
             context.AddSource("OperatorOverloadingAttachement_partial.cs", SourceText.From(codeText.ToString(), Encoding.UTF8));
         }
