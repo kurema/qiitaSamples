@@ -51,6 +51,58 @@ namespace kurema.TernaryComparisonOperator
         }
     }
 
+    //    public class ComparisonValueDoubleGenerics<T1,T2>
+    //    {
+    //        public ComparisonValueDoubleGenerics(bool status, T1 valueLeft, T2 valueRight)
+    //        {
+    //            Status = status;
+    //            ValueLeft = valueLeft;
+    //            ValueRight = valueRight;
+    //        }
+
+    //        public T1 ValueLeft { get; init; }
+    //        public T2 ValueRight { get; init; }
+    //        public bool Status { get; init; }
+
+    //        public static bool operator true(ComparisonValueDoubleGenerics<T1,T2> value) => value.Status;
+    //        public static bool operator false(ComparisonValueDoubleGenerics<T1, T2> value) => !value.Status;
+
+    //        public static ComparisonValueDoubleGenerics<T1,T3> operator <<T3> (ComparisonValueDoubleGenerics<T1, T2> left, ComparisonValueDoubleGenerics<T1, T2> right)
+    //        {
+    //            //https://github.com/dotnet/csharplang/discussions/612
+    //        }
+
+    //}
+
+    //public class ComparisonValueGeneral
+    //{
+    //    public ComparisonValueGeneral(bool status, object valueLeft, object valueRight)
+    //    {
+    //        Status = status;
+    //        ValueLeft = valueLeft;
+    //        ValueRight = valueRight;
+    //    }
+
+    //    public object ValueLeft { get; init; }
+    //    public object ValueRight { get; init; }
+    //    public bool Status { get; init; }
+
+    //    public static bool operator true(ComparisonValueGeneral value) => value.Status;
+    //    public static bool operator false(ComparisonValueGeneral value) => !value.Status;
+
+    //    private static bool Operate(string methodName,object left,object right)
+    //    {
+    //        var leftType = left?.GetType();
+    //        var rightType = right?.GetType();
+    //        if (leftType is null || rightType is null) throw new ArgumentException();
+    //        var method = leftType?.GetMethod(methodName);
+    //        if (method == null) throw new ArgumentException(nameof(left));
+    //        var parameters = method.GetParameters();
+    //        if (parameters?.Length != 2 || parameters[0].ParameterType != leftType) throw new ArgumentException(nameof(methodName));
+            
+    //    }
+
+    //}
 
     public static class Extensions
     {
@@ -72,6 +124,11 @@ namespace kurema.TernaryComparisonOperator
         public static ComparisonValueDouble ToComp(this byte from)
         {
             return new ComparisonValueDouble(true, from, from);
+            double a, b;
+            if (a > b)
+            {
+
+            }
         }
 
         public static ComparisonValueDouble ToComp(this short from)
