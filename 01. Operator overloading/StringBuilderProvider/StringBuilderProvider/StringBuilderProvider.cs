@@ -41,7 +41,7 @@ namespace kurema.StringBuilderProvider
 
         public static TextChain operator +(TextChain origin, string append) => new TextChain(origin, append);
         public static TextChainCombined operator +(TextChain left, IStringBuilderProvider right) => new TextChainCombined(left, right);
-        public static TextChainEx operator +(string append, TextChain origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(append, 0));
+        public static TextChainEx operator +(string append, TextChain origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(0, append));
 
 
         public static explicit operator string(TextChain from) => from.ToString();
@@ -67,7 +67,7 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChain operator +(TextChainCombined origin, string append) => new TextChain(origin, append);
-        public static TextChainEx operator +(string append, TextChainCombined origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(append, 0));
+        public static TextChainEx operator +(string append, TextChainCombined origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(0, append));
         public static TextChainCombined operator +(TextChainCombined left, IStringBuilderProvider right) => new TextChainCombined(left, right);
 
         public static explicit operator string(TextChainCombined from) => from.ToString();
@@ -100,12 +100,17 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChain operator +(TextChainEx origin, string append) => new TextChain(origin, append);
-        public static TextChainEx operator +(string append, TextChainEx origin) => new TextChainEx(origin, new Operations.Insert(append, 0));
+        public static TextChainEx operator +(string append, TextChainEx origin) => new TextChainEx(origin, new Operations.Insert(0, append));
         public static TextChainCombined operator +(TextChainEx left, IStringBuilderProvider right) => new TextChainCombined(left, right);
 
 
         public static explicit operator string(TextChainEx from) => from.ToString();
         public override string ToString() => GetStringBuilder().ToString();
+
+        public static TextChainEx Append(IStringBuilderProvider stringBuilder, string text) => new TextChainEx(stringBuilder, new Operations.Append(text));
+        public static TextChainEx AppendLine(IStringBuilderProvider stringBuilder, string text) => new TextChainEx(stringBuilder, new Operations.AppendLine(text));
+        public static TextChainEx Insert(IStringBuilderProvider stringBuilder, string text, int index) => new TextChainEx(stringBuilder, new Operations.Insert(index, text));
+        public static TextChainEx ReplaceString(IStringBuilderProvider stringBuilder, string oldValue, string newValue) => new TextChainEx(stringBuilder, new Operations.ReplaceString(oldValue, newValue));
 
 
         public class Operations
@@ -142,7 +147,7 @@ namespace kurema.StringBuilderProvider
 
             public class Insert : IOperation
             {
-                public Insert(string value, int index)
+                public Insert(int index, string value)
                 {
                     Value = value ?? throw new ArgumentNullException(nameof(value));
                     Index = index;
