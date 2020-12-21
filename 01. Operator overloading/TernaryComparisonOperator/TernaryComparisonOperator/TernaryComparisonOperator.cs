@@ -13,9 +13,9 @@ namespace kurema.TernaryComparisonOperator
             ValueRight = valueRight;
         }
 
-        public double ValueLeft { get; init; }
-        public double ValueRight { get; init; }
-        public bool Status { get; init; }
+        public double ValueLeft { get; private set; }
+        public double ValueRight { get; private set; }
+        public bool Status { get; private set; }
 
         public static bool operator true(ComparisonValueDouble value) => value.Status;
         public static bool operator false(ComparisonValueDouble value) => !value.Status;
@@ -47,62 +47,13 @@ namespace kurema.TernaryComparisonOperator
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ValueLeft, ValueRight, Status);
+            int hashCode = -1462305666;
+            hashCode = hashCode * -1521134295 + ValueLeft.GetHashCode();
+            hashCode = hashCode * -1521134295 + ValueRight.GetHashCode();
+            hashCode = hashCode * -1521134295 + Status.GetHashCode();
+            return hashCode;
         }
     }
-
-    //    public class ComparisonValueDoubleGenerics<T1,T2>
-    //    {
-    //        public ComparisonValueDoubleGenerics(bool status, T1 valueLeft, T2 valueRight)
-    //        {
-    //            Status = status;
-    //            ValueLeft = valueLeft;
-    //            ValueRight = valueRight;
-    //        }
-
-    //        public T1 ValueLeft { get; init; }
-    //        public T2 ValueRight { get; init; }
-    //        public bool Status { get; init; }
-
-    //        public static bool operator true(ComparisonValueDoubleGenerics<T1,T2> value) => value.Status;
-    //        public static bool operator false(ComparisonValueDoubleGenerics<T1, T2> value) => !value.Status;
-
-    //        public static ComparisonValueDoubleGenerics<T1,T3> operator <<T3> (ComparisonValueDoubleGenerics<T1, T2> left, ComparisonValueDoubleGenerics<T1, T2> right)
-    //        {
-    //            //https://github.com/dotnet/csharplang/discussions/612
-    //        }
-
-    //}
-
-    //public class ComparisonValueGeneral
-    //{
-    //    public ComparisonValueGeneral(bool status, object valueLeft, object valueRight)
-    //    {
-    //        Status = status;
-    //        ValueLeft = valueLeft;
-    //        ValueRight = valueRight;
-    //    }
-
-    //    public object ValueLeft { get; init; }
-    //    public object ValueRight { get; init; }
-    //    public bool Status { get; init; }
-
-    //    public static bool operator true(ComparisonValueGeneral value) => value.Status;
-    //    public static bool operator false(ComparisonValueGeneral value) => !value.Status;
-
-    //    private static bool Operate(string methodName,object left,object right)
-    //    {
-    //        var leftType = left?.GetType();
-    //        var rightType = right?.GetType();
-    //        if (leftType is null || rightType is null) throw new ArgumentException();
-    //        var method = leftType?.GetMethod(methodName);
-    //        if (method == null) throw new ArgumentException(nameof(left));
-    //        var parameters = method.GetParameters();
-    //        if (parameters?.Length != 2 || parameters[0].ParameterType != leftType) throw new ArgumentException(nameof(methodName));
-            
-    //    }
-
-    //}
 
     public static class Extensions
     {
@@ -124,11 +75,6 @@ namespace kurema.TernaryComparisonOperator
         public static ComparisonValueDouble ToComp(this byte from)
         {
             return new ComparisonValueDouble(true, from, from);
-            double a, b;
-            if (a > b)
-            {
-
-            }
         }
 
         public static ComparisonValueDouble ToComp(this short from)

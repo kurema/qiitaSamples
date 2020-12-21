@@ -9,6 +9,7 @@ namespace kurema.StringBuilderProvider
         StringBuilder GetStringBuilder();
     }
 
+
     public abstract class TextChainBase<T> : IStringBuilderProvider where T : IStringBuilderProvider
     {
         protected TextChainBase()
@@ -41,8 +42,123 @@ namespace kurema.StringBuilderProvider
 
         public static TextChain operator +(TextChain origin, string append) => new TextChain(origin, append);
 
+        public static TextChainEx operator +(string append, TextChain origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(append, 0));
+
+
         public static implicit operator string(TextChain from)=>from.ToString();
         public override string ToString() => this.GetStringBuilder().ToString();
+    }
+
+    public class TextChainEx : IStringBuilderProvider
+    {
+        public TextChainEx(IStringBuilderProvider? origin, TextChainEx.IOperation operation)
+        {
+            Origin = origin;
+            Operation = operation ?? throw new ArgumentNullException(nameof(operation));
+        }
+
+        public IStringBuilderProvider? Origin { get; protected set; } = null;
+
+        public IOperation Operation { get; private set; }
+
+        public StringBuilder GetStringBuilder()
+        {
+            var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+            Operation?.Operate(sb);
+            return sb;
+        }
+
+        public interface IOperation
+        {
+            void Operate(StringBuilder stringBuilder);
+        }
+
+        public static TextChain operator +(TextChainEx origin, string append) => new TextChain(origin, append);
+
+        public static TextChainEx operator +(string append, TextChainEx origin) => new TextChainEx(origin, new Operations.Insert(append, 0));
+
+
+        public static implicit operator string(TextChainEx from) => from.ToString();
+        public override string ToString() => GetStringBuilder().ToString();
+
+
+        public class Operations
+        {
+            public class Append : IOperation
+            {
+                public string Appended { get; private set; }
+
+                public Append(string appended)
+                {
+                    Appended = appended ?? throw new ArgumentNullException(nameof(appended));
+                }
+
+                public void Operate(StringBuilder stringBuilder)
+                {
+                    stringBuilder.Append(Appended);
+                }
+            }
+
+            public class AppendLine : IOperation
+            {
+                public string Appended { get; private set; }
+
+                public AppendLine(string appended)
+                {
+                    Appended = appended ?? throw new ArgumentNullException(nameof(appended));
+                }
+
+                public void Operate(StringBuilder stringBuilder)
+                {
+                    stringBuilder.AppendLine(Appended);
+                }
+            }
+
+            public class Insert : IOperation
+            {
+                public Insert(string value, int index)
+                {
+                    Value = value ?? throw new ArgumentNullException(nameof(value));
+                    Index = index;
+                }
+
+                public string Value { get; private set; }
+                public int Index { get; private set; }
+
+                public void Operate(StringBuilder stringBuilder)
+                {
+                    stringBuilder.Insert(Index, Value);
+                }
+            }
+
+            public class ReplaceString : IOperation
+            {
+                public ReplaceString(string oldValue, string newValue, int? startIndex, int? count)
+                {
+                    OldValue = oldValue ?? throw new ArgumentNullException(nameof(oldValue));
+                    NewValue = newValue ?? throw new ArgumentNullException(nameof(newValue));
+                    StartIndex = startIndex;
+                    Count = count;
+                }
+
+                public ReplaceString(string oldValue, string newValue)
+                {
+                    OldValue = oldValue ?? throw new ArgumentNullException(nameof(oldValue));
+                    NewValue = newValue ?? throw new ArgumentNullException(nameof(newValue));
+                }
+
+                public string OldValue { get; private set; }
+                public string NewValue { get; private set; }
+                public int? StartIndex { get; private set; }
+                public int? Count { get; private set; }
+
+                public void Operate(StringBuilder stringBuilder)
+                {
+                    if (StartIndex is null || Count is null) stringBuilder.Replace(OldValue, NewValue);
+                    else stringBuilder.Replace(OldValue, NewValue, StartIndex ?? 0, Count ?? 0);
+                }
+            }
+        }
     }
 
     public class TextChainBrainfuck : TextChain
@@ -181,7 +297,7 @@ namespace kurema.StringBuilderProvider
         public int IndentShift { get; set; } = 0;
         public string? IndentText { get; set; } = null;
 
-        public static string IndentTextDefault = new string(' ', 4);
+        public const string IndentTextDefault = "    ";
 
         public override StringBuilder GetStringBuilder()
         {

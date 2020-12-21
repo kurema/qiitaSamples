@@ -14,8 +14,7 @@ namespace TestConsole
                 sb += "Vpon a fearfull Summons. I haue heard,";
                 sb += "The Cocke that is the Trumpet to the day,";
 
-                var builder = sb.GetStringBuilder();
-                Console.Write(builder.ToString());
+                Console.Write(sb);
             }
             {
                 var sb = new TextChainBrainfuck();
@@ -252,9 +251,7 @@ namespace TestConsole
                 sb += "}";
                 sb.Unindent();
                 sb += "}";
-
-                var builder = sb.GetStringBuilder();
-                Console.WriteLine(builder.ToString());
+                Console.WriteLine(sb);
             }
         }
     }
