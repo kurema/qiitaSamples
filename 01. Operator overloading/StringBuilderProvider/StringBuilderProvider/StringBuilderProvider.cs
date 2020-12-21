@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace kurema.StringBuilderProvider
 {
     public interface IStringBuilderProvider
     {
-        StringBuilder GetStringBuilder();
+        StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null);
     }
 
 
@@ -22,7 +21,7 @@ namespace kurema.StringBuilderProvider
             Appended = appended ?? throw new ArgumentNullException(nameof(appended));
         }
 
-        public abstract StringBuilder GetStringBuilder();
+        public abstract StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null);
 
         public T? Origin { get; protected set; } = default(T);
         public string? Appended { get; protected set; } = null;
@@ -33,20 +32,47 @@ namespace kurema.StringBuilderProvider
         public TextChain() : base() { }
         public TextChain(IStringBuilderProvider? origin, string appended) : base(origin, appended) { }
 
-        public override StringBuilder GetStringBuilder()
+        public override StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null)
         {
-            var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+            var sb = Origin?.GetStringBuilder(stringBuilder) ?? stringBuilder ?? new StringBuilder();
             if (!string.IsNullOrEmpty(Appended)) sb.Append(Appended);
             return sb;
         }
 
         public static TextChain operator +(TextChain origin, string append) => new TextChain(origin, append);
-
+        public static TextChainCombined operator +(TextChain left, IStringBuilderProvider right) => new TextChainCombined(left, right);
         public static TextChainEx operator +(string append, TextChain origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(append, 0));
 
 
-        public static implicit operator string(TextChain from)=>from.ToString();
+        public static explicit operator string(TextChain from) => from.ToString();
         public override string ToString() => this.GetStringBuilder().ToString();
+    }
+
+    public class TextChainCombined : IStringBuilderProvider
+    {
+        public TextChainCombined(IStringBuilderProvider left, IStringBuilderProvider right)
+        {
+            Left = left ?? throw new ArgumentNullException(nameof(left));
+            Right = right ?? throw new ArgumentNullException(nameof(right));
+        }
+
+        public IStringBuilderProvider Left { get; private set; }
+        public IStringBuilderProvider Right { get; private set; }
+
+        public StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null)
+        {
+            var sb = Left?.GetStringBuilder();
+            sb = Right?.GetStringBuilder(sb);
+            return sb ?? new StringBuilder();
+        }
+
+        public static TextChain operator +(TextChainCombined origin, string append) => new TextChain(origin, append);
+        public static TextChainEx operator +(string append, TextChainCombined origin) => new TextChainEx(origin, new TextChainEx.Operations.Insert(append, 0));
+        public static TextChainCombined operator +(TextChainCombined left, IStringBuilderProvider right) => new TextChainCombined(left, right);
+
+        public static explicit operator string(TextChainCombined from) => from.ToString();
+        public override string ToString() => this.GetStringBuilder().ToString();
+
     }
 
     public class TextChainEx : IStringBuilderProvider
@@ -61,9 +87,9 @@ namespace kurema.StringBuilderProvider
 
         public IOperation Operation { get; private set; }
 
-        public StringBuilder GetStringBuilder()
+        public StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null)
         {
-            var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+            var sb = Origin?.GetStringBuilder(stringBuilder) ?? stringBuilder ?? new StringBuilder();
             Operation?.Operate(sb);
             return sb;
         }
@@ -74,11 +100,11 @@ namespace kurema.StringBuilderProvider
         }
 
         public static TextChain operator +(TextChainEx origin, string append) => new TextChain(origin, append);
-
         public static TextChainEx operator +(string append, TextChainEx origin) => new TextChainEx(origin, new Operations.Insert(append, 0));
+        public static TextChainCombined operator +(TextChainEx left, IStringBuilderProvider right) => new TextChainCombined(left, right);
 
 
-        public static implicit operator string(TextChainEx from) => from.ToString();
+        public static explicit operator string(TextChainEx from) => from.ToString();
         public override string ToString() => GetStringBuilder().ToString();
 
 
@@ -275,18 +301,19 @@ namespace kurema.StringBuilderProvider
         public TextChainAutoBreak(IStringBuilderProvider? origin, string appended) : base(origin, appended) { }
 
 
-        public override StringBuilder GetStringBuilder()
+        public override StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null)
         {
-            var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+            var sb = Origin?.GetStringBuilder(stringBuilder) ?? stringBuilder ?? new StringBuilder();
             if (Appended is not null) sb.AppendLine(Appended);
             return sb;
         }
 
         public static TextChainAutoBreak operator +(TextChainAutoBreak origin, string append) => new TextChainAutoBreak(origin, append);
 
-        public static implicit operator string(TextChainAutoBreak from) => from.ToString();
+        public static explicit operator string(TextChainAutoBreak from) => from.ToString();
         public override string ToString() => this.GetStringBuilder().ToString();
 
+        public static TextChainCombined operator +(TextChainAutoBreak left, IStringBuilderProvider right) => new TextChainCombined(left, right);
     }
 
     public class TextChainAutoIndent : TextChainBase<IStringBuilderProvider>
@@ -299,22 +326,22 @@ namespace kurema.StringBuilderProvider
 
         public const string IndentTextDefault = "    ";
 
-        public override StringBuilder GetStringBuilder()
+        public override StringBuilder GetStringBuilder(StringBuilder? stringBuilder = null)
         {
-            var result = GetStringBuilderAndInfo();
+            var result = GetStringBuilderAndInfo(stringBuilder);
             return result.Builder;
         }
 
         public void Indent() => IndentShift++;
         public void Unindent() => IndentShift--;
 
-        public (StringBuilder Builder, int IndentLevel, string IndentText) GetStringBuilderAndInfo()
+        public (StringBuilder Builder, int IndentLevel, string IndentText) GetStringBuilderAndInfo(StringBuilder? stringBuilder = null)
         {
             switch (Origin)
             {
                 case TextChainAutoIndent originIndent:
                     {
-                        var currentResult = originIndent.GetStringBuilderAndInfo();
+                        var currentResult = originIndent.GetStringBuilderAndInfo(stringBuilder);
                         if (Appended is not null)
                         {
                             for (int i = 0; i < currentResult.IndentLevel; i++) currentResult.Builder.Append(currentResult.IndentText);
@@ -326,7 +353,7 @@ namespace kurema.StringBuilderProvider
                     }
                 default:
                     {
-                        var sb = Origin?.GetStringBuilder() ?? new StringBuilder();
+                        var sb = Origin?.GetStringBuilder(stringBuilder) ?? stringBuilder ?? new StringBuilder();
                         if (Appended is not null) sb.AppendLine(Appended);
                         return (sb, IndentShift, IndentText ?? IndentTextDefault);
                     }
@@ -335,9 +362,10 @@ namespace kurema.StringBuilderProvider
 
         public static TextChainAutoIndent operator +(TextChainAutoIndent origin, string append) => new TextChainAutoIndent(origin, append);
 
-        public static implicit operator string(TextChainAutoIndent from) => from.ToString();
+        public static explicit operator string(TextChainAutoIndent from) => from.ToString();
         public override string ToString() => this.GetStringBuilder().ToString();
 
+        public static TextChainCombined operator +(TextChainAutoIndent left, IStringBuilderProvider right) => new TextChainCombined(left, right);
     }
 
 }

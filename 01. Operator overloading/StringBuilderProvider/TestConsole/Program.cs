@@ -251,7 +251,10 @@ namespace TestConsole
                 sb += "}";
                 sb.Unindent();
                 sb += "}";
-                Console.WriteLine(sb);
+
+                var sb2 = new TextChainAutoBreak();
+                sb2 += "Program:";
+                Console.WriteLine(sb2 + sb);
             }
         }
     }
