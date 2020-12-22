@@ -16,6 +16,7 @@ namespace TestConsole
                 if (response.StartsWith("exit")) break;
                 if (double.TryParse(response, out double number))
                 {
+                    //if (new Comparison()< 2 <= number <= 4.0)
                     if (2.ToComp() <= number <= 4.0)
                     {
                         Console.WriteLine($"{number} is between 2 and 4!");

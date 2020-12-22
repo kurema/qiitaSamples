@@ -3,6 +3,40 @@ using kurema.TernaryComparisonOperator;
 
 namespace kurema.TernaryComparisonOperator
 {
+    public class Comparison
+    {
+        public static ComparisonValueDouble operator ==(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator ==(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+        public static ComparisonValueDouble operator !=(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator !=(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+        public static ComparisonValueDouble operator <(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator <(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+        public static ComparisonValueDouble operator >(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator >(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+        public static ComparisonValueDouble operator <=(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator <=(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+        public static ComparisonValueDouble operator >=(Comparison left, double right) => new ComparisonValueDouble(true, right, right);
+        public static ComparisonValueDouble operator >=(double left, Comparison right) => new ComparisonValueDouble(true, left, left);
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as ComparisonValueDouble);
+        }
+
+        public bool Equals(ComparisonValueDouble? other)
+        {
+            return other is not null;
+        }
+
+        //new Comparison()よりComparison.NewCompの方が書きやすい場合。
+        public static Comparison NewComp => new Comparison();
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
     [kurema.TernaryComparisonOperator.OperatorOverloadingAttacher.OperatorOverloadingAttachTarget]
     public partial class ComparisonValueDouble : IEquatable<ComparisonValueDouble?>
     {
