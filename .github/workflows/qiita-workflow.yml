@@ -7,7 +7,7 @@ on:
 
 jobs:
   update-readme-with-youtube:
-    name: Update this repo's README with latest videos from YouTube
+    name: Update this repo's README with latest articles from Qiita
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
