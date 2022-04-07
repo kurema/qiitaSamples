@@ -7,7 +7,6 @@ Qiita記事のサンプルをここに置きます。
 - [【計算と哲学】世界は計算だ！](https://qiita.com/kurema/items/c1deae7e5539b893f936)
 - [【計算と哲学？】宇宙人へのコンタクト](https://qiita.com/kurema/items/a30377b322ddcc35d01e)
 - [【計算と哲学】計算機が数学より先だったら &lpar;SF風&rpar;](https://qiita.com/kurema/items/9f86aef8b7306c46d5c3)
-- [【計算と哲学】計算結果はあらかじめ決まっている？](https://qiita.com/kurema/items/4155c2349ecb093baf14)
 <!-- QIITA:END -->
 
 ## ライセンス
