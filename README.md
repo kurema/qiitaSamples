@@ -3,10 +3,10 @@ Qiita記事のサンプルをここに置きます。
 
 ## 最新記事
 <!-- QIITA:START -->
+- [GeneratedRegexで遊ぶ](https://qiita.com/kurema/items/068385ba2f8bbe3858e1)
 - [【計算と哲学】意識と計算 / 後書き](https://qiita.com/kurema/items/3e9e2c3b2f6b6bbce094)
 - [【計算と哲学】世界は計算だ！](https://qiita.com/kurema/items/c1deae7e5539b893f936)
 - [【計算と哲学？】宇宙人へのコンタクト](https://qiita.com/kurema/items/a30377b322ddcc35d01e)
-- [【計算と哲学】計算機が数学より先だったら &lpar;SF風&rpar;](https://qiita.com/kurema/items/9f86aef8b7306c46d5c3)
 <!-- QIITA:END -->
 
 ## ライセンス
